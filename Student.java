@@ -1,15 +1,28 @@
 package prjct;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Student extends Prsn {
+    protected String password;
     private ArrayList<String> assignedCourses;
 
-    public Student(String id, String name, String email) {
+    public Student(String id, String name, String email,String password) {
         super(id, name, email);
         this.assignedCourses = new ArrayList<>();
+        this.password = password;
     }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 
     // Getter for assignedCourses
     public ArrayList<String> getAssignedCourses() {
@@ -45,51 +58,61 @@ public class Student extends Prsn {
 
     // Save student data to a file
     private void saveStudentData() {
-        try (FileWriter writer = new FileWriter("students.txt", true)) { // Append mode
-            writer.write(id + " - " + name + " - " + email + "\n");
+        try (FileWriter writer = new FileWriter("students.txt", false)) { // Overwrite mode
+            writer.write("Id : " + id + " - " +"Name : " + name + " - " +"Email : " + email + " - " +"Password : " + password + "\n");
             writer.write("Assigned Courses:\n");
             for (String course : assignedCourses) {
                 writer.write("- " + course + "\n");
             }
+            writer.write("\n"); // Separate each student's data with a blank line
         } catch (IOException e) {
             System.out.println("Error saving student data: " + e.getMessage());
         }
     }
 
+
     // Load student data from the file
-    public static Student loadStudentData(String studentId) {
+    public static Student loadStudentData(String studentId, String inputPassword) {
         File file = new File("students.txt");
         if (!file.exists()) {
             System.out.println("No student data file found.");
             return null;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
+        try (Scanner scanner = new Scanner(file)) {
             boolean studentFound = false;
             String name = null;
             String email = null;
+            String password = null;
             ArrayList<String> courses = new ArrayList<>();
 
-            while ((line = reader.readLine()) != null) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
                 if (line.startsWith(studentId)) {
                     String[] parts = line.split(" - ");
-                    if (parts.length == 3) {
+                    if (parts.length == 4) {
                         name = parts[1];
                         email = parts[2];
+                        password = parts[3];
                         studentFound = true;
                     }
                 } else if (studentFound && line.startsWith("- ")) {
-                    courses.add(line.substring(2)); // Remove "- " prefix
+                    courses.add(line.substring(2));
                 } else if (studentFound && line.isEmpty()) {
                     break; // End of this student's data
                 }
             }
 
-            if (studentFound && name != null && email != null) {
-                Student student = new Student(studentId, name, email);
-                student.assignedCourses.addAll(courses);
-                return student;
+            if (studentFound && name != null && email != null && password != null) {
+                if (password.equals(inputPassword)) {
+                    Student student = new Student(studentId, name, email, password);
+                    student.assignedCourses.addAll(courses);
+                    return student;
+                } else {
+                    System.out.println("Invalid password. Access denied.");
+                }
+            } else {
+                System.out.println("Student not found or incomplete data.");
             }
         } catch (IOException e) {
             System.out.println("Error loading student data: " + e.getMessage());
@@ -99,8 +122,7 @@ public class Student extends Prsn {
     }
 
 
-
-
+    @Override
     public String toString() {
         return "Student ID: " + id + ", Name: " + name + ", Email: " + email + ", Assigned Courses: " + assignedCourses;
     }

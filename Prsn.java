@@ -6,6 +6,7 @@ package prjct;
         protected String id;
         protected String name;
         protected String email;
+//        protected String password;
 
         public Prsn(String id, String name, String email) {
             this.id = id;
