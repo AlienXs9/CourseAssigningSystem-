@@ -22,22 +22,18 @@ public class Dep {
 
 
     private void addDefaultCourses() {
-        if (courses.isEmpty()) { // Only add defaults if no courses are already loaded
-            // List of default faculty names and their default passwords
-            String[][] defaultFacultyInfo = {
-                    {"Dr. Smith", "smith123"},
-                    {"Dr. Johnson", "johnson123"},
-                    {"Dr. Williams", "williams123"},
-                    {"Dr. Brown", "brown123"}
-            };
+        if (courses.isEmpty()) {
+            // Create courses directory if it doesn't exist
+            File courseDir = new File("courses");
+            if (!courseDir.exists()) {
+                courseDir.mkdir();
+            }
 
-            // Loop through each default faculty info and check if they already exist
-            for (String[] facultyInfo : defaultFacultyInfo) {
-                String facultyName = facultyInfo[0];
-                String defaultPassword = facultyInfo[1];
+            String[] defaultFacultyNames = {"Dr.Smith", "Dr.Johnson", "Dr.Williams", "Dr.Brown"};
+
+            for (String facultyName : defaultFacultyNames) {
                 boolean facultyExists = false;
 
-                // Check if the faculty already exists in the faculty list
                 for (Faculty faculty : facultyList) {
                     if (faculty.name.equals(facultyName)) {
                         facultyExists = true;
@@ -45,38 +41,29 @@ public class Dep {
                     }
                 }
 
-                // If the faculty doesn't exist, create and add them with default password
                 if (!facultyExists) {
-                    Faculty newFaculty = new Faculty("F" + (facultyList.size() + 1), facultyName, facultyName.toLowerCase().replace(" ", "") + "@university.edu", defaultPassword);  // Set default password);
+                    Faculty newFaculty = new Faculty("F" + (facultyList.size() + 1),
+                            facultyName,
+                            facultyName.toLowerCase().replace(" ", "") + "@university.edu");
                     facultyList.add(newFaculty);
 
-                    // Assign default courses to the new faculty based on their name
-                    if (facultyName.equals("Dr. Smith")) {
+                    if (facultyName.equals("Dr.Smith")) {
                         newFaculty.assignCourse("CSE110");
-                    } else if (facultyName.equals("Dr. Johnson")) {
+                    } else if (facultyName.equals("Dr.Johnson")) {
                         newFaculty.assignCourse("CSE103");
                     }
-
-                    System.out.println("Default faculty created: " + facultyName);
-                    System.out.println("Default email: " + newFaculty.email);
-                    System.out.println("Default password: " + defaultPassword);
-                    System.out.println("--------------------");
                 }
             }
 
-            // Add the default courses for each faculty
-            Course course1 = new Course("CSE110", 30, "Dr. Smith");
-            Course course2 = new Course("CSE103", 40, "Dr. Johnson");
+            Course course1 = new Course("CSE110", 30, "Dr.Smith");
+            Course course2 = new Course("CSE103", 40, "Dr.Johnson");
             courses.add(course1);
             courses.add(course2);
 
-            // Save data after adding
             saveCourses();
             saveFaculty();
-            System.out.println("Default courses and faculty data saved successfully.");
         }
     }
-
 
 
     public void addFaculty() {
@@ -91,7 +78,7 @@ public class Dep {
         System.out.print("Enter Faculty Email: ");
         String facultyEmail = scanner.nextLine();
 
-        Faculty newFaculty = new Faculty(facultyId, facultyName, facultyEmail,"");
+        Faculty newFaculty = new Faculty(facultyId, facultyName, facultyEmail);
         facultyList.add(newFaculty);
         saveFaculty();
         System.out.println("Faculty added: " + facultyName);
@@ -161,6 +148,12 @@ public class Dep {
     public void addNewCourse(String courseName, int seatCapacity) {
         Scanner scanner = new Scanner(System.in);
 
+        // Create courses directory if it doesn't exist
+        File courseDir = new File("courses");
+        if (!courseDir.exists()) {
+            courseDir.mkdir();
+        }
+
         if (findCourseByName(courseName) != null) {
             System.out.println("Course with name " + courseName + " already exists.");
             return;
@@ -178,6 +171,7 @@ public class Dep {
         Course newCourse = new Course(courseName, seatCapacity, faculty.name);
         courses.add(newCourse);
         faculty.assignCourse(courseName);
+
         try {
             saveCourses();
             saveFaculty();
@@ -202,24 +196,37 @@ public class Dep {
 
 
     // Method to load faculty from a file
-    private void loadFaculty() {
+    private void loadFaculty()
+    {
         File file = new File("faculty.txt");
         if (!file.exists()) {
             System.out.println("Faculty file not found. Starting with an empty faculty list.");
             return;
         }
+
         try (Scanner scanner = new Scanner(file)) {
+            Faculty currentFaculty = null;
+
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
-                String[] parts = line.split(" - ");
-                if (parts.length >= 4) {  // Updated to handle password field
-                    String facultyId = parts[0].replace("ID : ", "");
-                    String facultyName = parts[1].replace("Name : ", "");
-                    String facultyEmail = parts[2].replace("Email : ", "");
-                    String facultyPassword = parts[3].replace("Password : ", "");
+                if (line.startsWith("ID : ")) {
+                    // Parse faculty basic info
+                    String[] parts = line.split(" - ");
+                    if (parts.length == 3) {
+                        String facultyId = parts[0].replace("ID : ", "");
+                        String facultyName = parts[1].replace("Name : ", "");
+                        String facultyEmail = parts[2].replace("Email : ", "");
 
-                    Faculty faculty = new Faculty(facultyId, facultyName, facultyEmail, facultyPassword);
-                    facultyList.add(faculty);
+                        currentFaculty = new Faculty(facultyId, facultyName, facultyEmail);
+                        facultyList.add(currentFaculty);
+                    }
+                } else if (line.startsWith("COURSE : ") && currentFaculty != null) {
+                    // Parse and add course assignment
+                    String[] parts = line.split(" - ");
+                    if (parts.length == 2) {
+                        String courseName = parts[1];
+                        currentFaculty.assignCourse(courseName);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -228,16 +235,16 @@ public class Dep {
     }
 
 
-
-
     // Method to save faculty to a file
-    public void saveFaculty() {
+    private void saveFaculty() {
         try (FileWriter writer = new FileWriter("faculty.txt")) {
-            // Use a set to avoid duplicate faculty records
             for (Faculty faculty : facultyList) {
-                // Write each unique faculty entry to the file
-                writer.write("ID : " + faculty.id + " - Name : " + faculty.name + " - Email : " + faculty.email + " - Password : " +
-                        (faculty.getPassword() != null ? faculty.getPassword() : "") + "\n");
+                // Save basic faculty info
+                writer.write("ID : " + faculty.id + " - Name : " + faculty.name + " - Email : " + faculty.email + "\n");
+                // Save assigned courses
+                for (String course : faculty.getAssignedCourses()) {
+                    writer.write("COURSE : " + faculty.id + " - " + course + "\n");
+                }
             }
             System.out.println("Faculty data saved successfully.");
         } catch (IOException e) {
@@ -339,20 +346,21 @@ public class Dep {
 
     public Course findCourseByName(String courseName) {
         for (Course course : courses) {
-            if (course.getCourseName().equals(courseName)) {
+            if (course.getCourseName().equalsIgnoreCase(courseName)) { // Made case-insensitive
                 return course;
             }
         }
-        return null; // Return null if no matching course is found
+        return null;
     }
 
 
     public void saveStudents() {
-        try (FileWriter writer = new FileWriter("students.txt")) { // Overwrite mode
+        try (PrintWriter writer = new PrintWriter(new File("students.txt"))) {
             for (Student student : students) {
-                writer.write(student.id + " - " + student.name + " - " + student.email + " - " + student.password + "\n");
+                writer.println(student.id + " - " + student.name + " - " +
+                        student.email + " - " + student.password);
                 for (String course : student.getAssignedCourses()) {
-                    writer.write(student.id + " - " + course + "\n");
+                    writer.println(student.id + " - " + course);
                 }
             }
         } catch (IOException e) {
@@ -362,24 +370,26 @@ public class Dep {
 
 
 
+
     private void loadStudents() {
         File file = new File("students.txt");
         if (!file.exists()) return;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
+        try (Scanner scanner = new Scanner(file)) {
             Student currentStudent = null;
 
-            while ((line = reader.readLine()) != null) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
                 String[] parts = line.split(" - ");
-                if (parts.length == 4) { // Include password
+
+                if (parts.length == 4) { // New student entry
                     String id = parts[0];
                     String name = parts[1];
                     String email = parts[2];
                     String password = parts[3];
                     currentStudent = new Student(id, name, email, password);
                     students.add(currentStudent);
-                } else if (parts.length == 2 && currentStudent != null) {
+                } else if (parts.length == 2 && currentStudent != null) { // Course entry
                     currentStudent.assignCourse(parts[1]);
                 }
             }
@@ -389,7 +399,14 @@ public class Dep {
     }
 
 
+
     private void saveCourses() {
+        // Create courses directory if it doesn't exist
+        File courseDir = new File("courses");
+        if (!courseDir.exists()) {
+            courseDir.mkdir();
+        }
+
         for (Course course : courses) {
             course.saveCourseData();
         }
@@ -397,29 +414,22 @@ public class Dep {
 
 
     private void loadCourses() {
+        courses.clear(); // Clear existing courses before loading
+
         File courseDir = new File("courses");
         if (!courseDir.exists()) {
-            if (courseDir.mkdir()) {
-                System.out.println("Created 'courses' directory.");
-            } else {
-                System.out.println("Failed to create 'courses' directory.");
-                return;
-            }
+            courseDir.mkdir();
+            return;
         }
 
-        if (courseDir.isDirectory()) {
-            File[] courseFiles = courseDir.listFiles();
-            if (courseFiles != null && courseFiles.length > 0) {
-                for (File courseFile : courseFiles) {
-                    Course course = Course.loadCourseFromFile(courseFile.getAbsolutePath());
-                    if (course != null) {
-                        courses.add(course);
-                    }
+        File[] courseFiles = courseDir.listFiles((dir, name) -> name.endsWith(".txt"));
+        if (courseFiles != null) {
+            for (File courseFile : courseFiles) {
+                Course course = Course.loadCourseFromFile(courseFile.getAbsolutePath());
+                if (course != null) {
+                    courses.add(course);
                 }
             }
-        }
-        else {
-            System.out.println("'courses' is not a directory.");
         }
     }
 
@@ -429,13 +439,13 @@ public class Dep {
         File file = new File("students.txt");
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            Scanner scanner = new Scanner(file);
             ArrayList<String> existingLines = new ArrayList<>();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                existingLines.add(line);
+
+            while (scanner.hasNextLine()) {
+                existingLines.add(scanner.nextLine());
             }
-            reader.close();
+            scanner.close();
 
             FileWriter writer = new FileWriter(file, true); // Append mode
             for (String course : student.getAssignedCourses()) {

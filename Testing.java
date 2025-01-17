@@ -184,27 +184,8 @@ public class Testing {
             return;
         }
 
-        // Check if faculty has a password set
-        if (faculty.getPassword() == null || faculty.getPassword().isEmpty()) {
-            System.out.println("You need to set a password for your account.");
-            System.out.print("Enter your new password: ");
-            String newPassword = scanner.nextLine();
-            faculty.setPassword(newPassword);
-            de.saveFaculty();
-            System.out.println("Password set successfully! Please log in again.");
-            return;
-        }
-
-        // Password verification
-        System.out.print("Enter your password: ");
-        String enteredPassword = scanner.nextLine();
-        if (!faculty.getPassword().equals(enteredPassword)) {
-            System.out.println("Incorrect password. Access denied.");
-            return;
-        }
-
         // Successful login
-        System.out.println("Login successful. Welcome, " + faculty.name + "!");
+        System.out.println("Welcome, " + faculty.name + "!");
         // Add additional functionality for logged-in faculty, e.g., view courses or update profile
 
         boolean running = true;

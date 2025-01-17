@@ -78,12 +78,23 @@ public class Course {
     }
 
     public void saveCourseData() {
-        try (FileWriter writer = new FileWriter(courseName + ".txt")) {
+        // Create courses directory if it doesn't exist
+        File courseDir = new File("courses");
+        if (!courseDir.exists()) {
+            courseDir.mkdir();
+        }
+
+        try (FileWriter writer = new FileWriter("courses/" + courseName + ".txt")) {
             writer.write("Course Name: " + courseName + "\n");
             writer.write("Seat Capacity: " + seatCapacity + "\n");
             writer.write("Enrolled Students: " + enrolledCount + "\n");
+            writer.write("Faculty Name: " + (facultyName != null ? facultyName : "Not Assigned") + "\n");
+
+            // Write student data
             for (int i = 0; i < studentIds.size(); i++) {
-                writer.write("Name : " + studentNames.get(i) + " - " + "Id : " + studentIds.get(i) + " - " + "Email : " +  studentEmails.get(i) + "\n");
+                writer.write("Student - Name: " + studentNames.get(i) +
+                        " - ID: " + studentIds.get(i) +
+                        " - Email: " + studentEmails.get(i) + "\n");
             }
         } catch (IOException e) {
             System.out.println("Error saving course data: " + e.getMessage());
@@ -94,44 +105,42 @@ public class Course {
         try (Scanner scanner = new Scanner(new File(filename))) {
             String courseName = null;
             int seatCapacity = 0;
+            String facultyName = null;
             ArrayList<String> studentIds = new ArrayList<>();
             ArrayList<String> studentNames = new ArrayList<>();
             ArrayList<String> studentEmails = new ArrayList<>();
 
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                if (line.contains(": ")) {
-                    String[] parts = line.split(": ");
-                    if (parts.length == 2) {
-                        switch (parts[0].trim()) {
-                            case "Course Name":
-                                courseName = parts[1].trim();
-                                break;
-                            case "Seat Capacity":
-                                seatCapacity = Integer.parseInt(parts[1].trim());
-                                break;
-                            default:
-                                break;
-                        }
+                if (line.startsWith("Course Name: ")) {
+                    courseName = line.substring("Course Name: ".length());
+                } else if (line.startsWith("Seat Capacity: ")) {
+                    seatCapacity = Integer.parseInt(line.substring("Seat Capacity: ".length()));
+                } else if (line.startsWith("Faculty Name: ")) {
+                    facultyName = line.substring("Faculty Name: ".length());
+                    if (facultyName.equals("Not Assigned")) {
+                        facultyName = null;
                     }
-                } else if (line.contains(" - ")) {
-                    String[] studentData = line.split(" - ");
-                    if (studentData.length == 3) { // Expecting ID, name, and email
-                        studentIds.add(studentData[0].trim());
-                        studentNames.add(studentData[1].trim());
-                        studentEmails.add(studentData[2].trim());
+                } else if (line.startsWith("Student - ")) {
+                    // Parse student data
+                    String[] parts = line.split(" - ");
+                    if (parts.length == 4) { // "Student", Name, ID, Email
+                        String name = parts[1].substring("Name: ".length());
+                        String id = parts[2].substring("ID: ".length());
+                        String email = parts[3].substring("Email: ".length());
+                        studentNames.add(name);
+                        studentIds.add(id);
+                        studentEmails.add(email);
                     }
                 }
             }
 
             if (courseName != null && seatCapacity > 0) {
-                Course course = new Course(courseName, seatCapacity, ""); // Faculty can be updated later
+                Course course = new Course(courseName, seatCapacity, facultyName);
                 for (int i = 0; i < studentIds.size(); i++) {
                     course.enrollStudent(studentIds.get(i), studentNames.get(i), studentEmails.get(i));
                 }
                 return course;
-            } else {
-                System.out.println("Error: Missing course details in file.");
             }
         } catch (IOException e) {
             System.out.println("Error loading course from file: " + e.getMessage());

@@ -3,14 +3,11 @@ package prjct;
 import java.util.ArrayList;
 
 public class Faculty extends Prsn {
+    public ArrayList<String> assignedCourses; // List of courses assigned to the faculty
 
-    private String password;
-    private ArrayList<String> assignedCourses; // List of courses assigned to the faculty
-
-    public Faculty(String id, String name, String email,String password) {
+    public Faculty(String id, String name, String email) {
         super(id, name, email );
         this.assignedCourses = new ArrayList<>();
-        this.password = password;
     }
 
     // Method to assign a course to the faculty
@@ -18,16 +15,6 @@ public class Faculty extends Prsn {
         if (!assignedCourses.contains(courseName)) {
             assignedCourses.add(courseName);
         }
-    }
-
-    public String getPassword()
-    {
-        return password;
-    }
-
-    public void setPassword(String password)
-    {
-        this.password = password;
     }
 
     // Method to view the faculty's profile
@@ -51,6 +38,7 @@ public class Faculty extends Prsn {
     public ArrayList<String> getAssignedCourses() {
         return assignedCourses;
     }
+
 
 
 }
