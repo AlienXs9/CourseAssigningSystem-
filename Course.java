@@ -1,5 +1,5 @@
 package prjct;
-//adwadawdaw
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,11 +22,11 @@ public class Course {
         this.studentIds = new ArrayList<>();
         this.studentNames = new ArrayList<>();
         this.studentEmails = new ArrayList<>();
-        this.facultyName = facultyName; // Initially no faculty assigned
+        this.facultyName = facultyName;
     }
 
     public Course(String courseName, int seatCapacity) {
-        this(courseName, seatCapacity, null); // Default facultyName to null
+        this(courseName, seatCapacity, null);
     }
 
     public String getCourseName() {
@@ -64,7 +64,8 @@ public class Course {
         System.out.println("Enrolled Students: " + enrolledCount);
         if (facultyName != null) {
             System.out.println("Faculty: " + facultyName);
-        } else {
+        }
+        else {
             System.out.println("Faculty: Not Assigned");
         }
 
@@ -77,19 +78,21 @@ public class Course {
     }
 
     public void saveCourseData() {
-        // Create courses directory if it doesn't exist
+
         File courseDir = new File("courses");
         if (!courseDir.exists()) {
             courseDir.mkdir();
         }
-
         try (FileWriter writer = new FileWriter("courses/" + courseName + ".txt")) {
             writer.write("Course Name: " + courseName + "\n");
             writer.write("Seat Capacity: " + seatCapacity + "\n");
             writer.write("Enrolled Students: " + enrolledCount + "\n");
-            writer.write("Faculty Name: " + (facultyName != null ? facultyName : "Not Assigned") + "\n");
-
-            // Write student data
+            if (facultyName != null) {
+                writer.write("Faculty Name: " + facultyName + "\n");
+            }
+            else {
+                writer.write("Faculty Name: Not Assigned\n");
+            }
             for (int i = 0; i < studentIds.size(); i++) {
                 writer.write("Student - Name: " + studentNames.get(i) +
                         " - ID: " + studentIds.get(i) +
@@ -101,7 +104,8 @@ public class Course {
     }
 
     public static Course loadCourseFromFile(String filename) {
-        try (Scanner scanner = new Scanner(new File(filename))) {
+
+        try (Scanner input = new Scanner(new File(filename))) {
             String courseName = null;
             int seatCapacity = 0;
             String facultyName = null;
@@ -109,21 +113,24 @@ public class Course {
             ArrayList<String> studentNames = new ArrayList<>();
             ArrayList<String> studentEmails = new ArrayList<>();
 
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                if (line.startsWith("Course Name: ")) {
+            while (input.hasNextLine()) {
+                String line = input.nextLine();
+                if (line.startsWith("Course Name: "))
+                {
                     courseName = line.substring("Course Name: ".length());
-                } else if (line.startsWith("Seat Capacity: ")) {
+                }
+                else if (line.startsWith("Seat Capacity: ")) {
                     seatCapacity = Integer.parseInt(line.substring("Seat Capacity: ".length()));
-                } else if (line.startsWith("Faculty Name: ")) {
+                }
+                else if (line.startsWith("Faculty Name: ")) {
                     facultyName = line.substring("Faculty Name: ".length());
                     if (facultyName.equals("Not Assigned")) {
                         facultyName = null;
                     }
-                } else if (line.startsWith("Student - ")) {
-                    // Parse student data
+                }
+                else if (line.startsWith("Student - ")) {
                     String[] parts = line.split(" - ");
-                    if (parts.length == 4) { // "Student", Name, ID, Email
+                    if (parts.length == 4) {
                         String name = parts[1].substring("Name: ".length());
                         String id = parts[2].substring("ID: ".length());
                         String email = parts[3].substring("Email: ".length());
@@ -133,7 +140,6 @@ public class Course {
                     }
                 }
             }
-
             if (courseName != null && seatCapacity > 0) {
                 Course course = new Course(courseName, seatCapacity, facultyName);
                 for (int i = 0; i < studentIds.size(); i++) {
@@ -148,6 +154,5 @@ public class Course {
         }
         return null;
     }
-
 
 }

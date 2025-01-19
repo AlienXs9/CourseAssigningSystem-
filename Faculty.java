@@ -3,21 +3,18 @@ package prjct;
 import java.util.ArrayList;
 
 public class Faculty extends Person {
-    public ArrayList<String> assignedCourses; // List of courses assigned to the faculty
-
+    public ArrayList<String> assignedCourses;
     public Faculty(String id, String name, String email) {
         super(id, name, email );
         this.assignedCourses = new ArrayList<>();
     }
 
-    // Method to assign a course to the faculty
     public void assignCourse(String courseName) {
         if (!assignedCourses.contains(courseName)) {
             assignedCourses.add(courseName);
         }
     }
 
-    // Method to view the faculty's profile
     @Override
     public void viewProfile() {
         System.out.println("Faculty Profile:");
@@ -35,12 +32,9 @@ public class Faculty extends Person {
             }
         }
     }
-    // Getter for assigned courses
     public ArrayList<String> getAssignedCourses() {
         return assignedCourses;
     }
-
-
 
 }
 
