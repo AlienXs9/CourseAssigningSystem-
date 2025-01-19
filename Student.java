@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class Student extends Person {
     protected String password;
-    public ArrayList<String> assignedCourses;
+    private ArrayList<String> assignedCourses;
 
     public Student(String id, String name, String email,String password) {
         super(id, name, email);
@@ -48,7 +48,7 @@ public class Student extends Person {
     }
 
     private void saveStudentData() {
-        try (FileWriter writer = new FileWriter("students.txt", false)) {
+        try (FileWriter writer = new FileWriter("students.txt", true)) {
             writer.write("Id : " + id + " - " +"Name : " + name + " - " +"Email : " + email + " - " +"Password : " + password + "\n");
             writer.write("Assigned Courses:\n");
             for (String course : assignedCourses) {

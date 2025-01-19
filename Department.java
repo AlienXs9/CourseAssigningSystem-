@@ -182,9 +182,9 @@ public class Department {
     }
 
     public void increaseCourseSeatSize() {
-        Scanner scanner = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
         System.out.print("Enter the course name to increase seat size: ");
-        String courseName = scanner.nextLine();
+        String courseName = input.nextLine();
         Course course = findCourseByName(courseName);
 
         if (course == null) {
@@ -193,8 +193,8 @@ public class Department {
         }
         System.out.print("Enter the additional seat count: ");
 
-        int additionalSeats = scanner.nextInt();
-        scanner.nextLine();
+        int additionalSeats = input.nextInt();
+        input.nextLine();
         course.increaseSeatCapacity(additionalSeats);
         saveCourses();
         System.out.println("Seat size increased for course " + courseName);
