@@ -29,7 +29,6 @@ public class Course {
         this(courseName, seatCapacity, null); // Default facultyName to null
     }
 
-
     public String getCourseName() {
         return courseName;
     }

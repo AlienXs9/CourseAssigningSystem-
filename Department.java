@@ -4,12 +4,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Dep {
+public class Department {
     private ArrayList<Course> courses;
     private ArrayList<Student> students;
     private ArrayList<Faculty> facultyList;
 
-    public Dep() {
+    public Department() {
         this.courses = new ArrayList<>();
         this.students = new ArrayList<>();
         this.facultyList = new ArrayList<>();
@@ -29,7 +29,7 @@ public class Dep {
                 courseDir.mkdir();
             }
 
-            String[] defaultFacultyNames = {"Dr.Smith", "Dr.Johnson", "Dr.Williams", "Dr.Brown"};
+            String[] defaultFacultyNames = {"Aasr", "Dmim", "Srzn", "Imran"};
 
             for (String facultyName : defaultFacultyNames) {
                 boolean facultyExists = false;
@@ -47,37 +47,37 @@ public class Dep {
                             facultyName.toLowerCase().replace(" ", "") + "@university.edu");
                     facultyList.add(newFaculty);
 
-                    if (facultyName.equals("Dr.Smith")) {
+                    if (facultyName.equals("Aasr")) {
                         newFaculty.assignCourse("CSE110");
-                    } else if (facultyName.equals("Dr.Johnson")) {
+                    }
+                    else if (facultyName.equals("Dmim")) {
+                        newFaculty.assignCourse("CSE103");
+                    }
+                    else if (facultyName.equals("Imran")){
                         newFaculty.assignCourse("CSE103");
                     }
                 }
             }
-
-            Course course1 = new Course("CSE110", 30, "Dr.Smith");
-            Course course2 = new Course("CSE103", 40, "Dr.Johnson");
+            Course course1 = new Course("CSE110", 30, "Aasr");
+            Course course2 = new Course("CSE103", 30, "Dmim");
+            Course course3 = new Course("CSE106",30,"Imran");
             courses.add(course1);
             courses.add(course2);
-
+            courses.add(course3);
             saveCourses();
             saveFaculty();
         }
     }
-
 
     public void addFaculty() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Enter Faculty ID: ");
         String facultyId = scanner.nextLine();
-
         System.out.print("Enter Faculty Name: ");
         String facultyName = scanner.nextLine();
-
         System.out.print("Enter Faculty Email: ");
         String facultyEmail = scanner.nextLine();
-
         Faculty newFaculty = new Faculty(facultyId, facultyName, facultyEmail);
         facultyList.add(newFaculty);
         saveFaculty();
@@ -94,19 +94,18 @@ public class Dep {
     }
 
     public void addStudents() {
-        Scanner scanner = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
         System.out.print("Enter the number of students to add: ");
 
-        int numStudents = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        int numStudents = input.nextInt();
+        input.nextLine(); // Consume newline
 
         for (int i = 0; i < numStudents; i++) {
             String studentId;
             boolean idExists;
             do {
                 System.out.print("Enter student ID (format: 2025-1-60-xx): ");
-                studentId = scanner.nextLine();
-
+                studentId = input.nextLine();
                 // Check if the student ID already exists
                 idExists = false;
                 for (Student student : students) {
@@ -119,10 +118,8 @@ public class Dep {
             } while (idExists);
 
             System.out.print("Enter student name: ");
-            String studentName = scanner.nextLine();
+            String studentName = input.nextLine();
 
-            // Generate a default password
-//            String defaultPassword = studentId + "@123";
 
             // Add student to list and save to file
             Student newStudent = new Student(studentId, studentName, studentId + "@std.ewubd.edu","");
@@ -167,12 +164,12 @@ public class Dep {
             System.out.println("Faculty not found. Please add the faculty first.");
             return;
         }
-
         Course newCourse = new Course(courseName, seatCapacity, faculty.name);
         courses.add(newCourse);
         faculty.assignCourse(courseName);
 
-        try {
+        try
+        {
             saveCourses();
             saveFaculty();
             System.out.println("Course added and assigned to faculty: '" + courseName + "' -> " + faculty.name);
@@ -189,26 +186,28 @@ public class Dep {
         if (loggedInFaculty != null) {
             // Print the details of the logged-in faculty
             loggedInFaculty.viewProfile();
-        } else {
+        }
+        else {
             System.out.println("No faculty member found with email: " + loggedInEmail);
         }
     }
-
 
     // Method to load faculty from a file
     private void loadFaculty()
     {
         File file = new File("faculty.txt");
         if (!file.exists()) {
-            System.out.println("Faculty file not found. Starting with an empty faculty list.");
+//            System.out.println("Faculty file not found. Starting with an empty faculty list.");
             return;
         }
 
-        try (Scanner scanner = new Scanner(file)) {
+        try
+        {
+            Scanner input = new Scanner(file);
             Faculty currentFaculty = null;
 
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine().trim();
+            while (input.hasNextLine()) {
+                String line = input.nextLine().trim();
                 if (line.startsWith("ID : ")) {
                     // Parse faculty basic info
                     String[] parts = line.split(" - ");
@@ -220,7 +219,8 @@ public class Dep {
                         currentFaculty = new Faculty(facultyId, facultyName, facultyEmail);
                         facultyList.add(currentFaculty);
                     }
-                } else if (line.startsWith("COURSE : ") && currentFaculty != null) {
+                }
+                else if (line.startsWith("COURSE : ") && currentFaculty != null) {
                     // Parse and add course assignment
                     String[] parts = line.split(" - ");
                     if (parts.length == 2) {
@@ -246,7 +246,7 @@ public class Dep {
                     writer.write("COURSE : " + faculty.id + " - " + course + "\n");
                 }
             }
-            System.out.println("Faculty data saved successfully.");
+//            System.out.println("Faculty data saved successfully.");
         } catch (IOException e) {
             System.out.println("Error saving faculty: " + e.getMessage());
         }
@@ -257,7 +257,8 @@ public class Dep {
     public void viewDepartmentDetails() {
         if (courses.isEmpty()) {
             System.out.println("No courses found.");
-        } else {
+        }
+        else {
             System.out.println("Courses Offered:");
             for (Course course : courses) {
                 course.displayCourseDetails();
@@ -267,10 +268,10 @@ public class Dep {
 
 
     public void assignCoursesToStudents() {
-        Scanner scanner = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
 
         System.out.print("Enter the course name to assign: ");
-        String courseName = scanner.nextLine();
+        String courseName = input.nextLine();
 
         Course course = findCourseByName(courseName);
         if (course == null) {
@@ -279,12 +280,12 @@ public class Dep {
         }
 
         System.out.print("Enter the number of students to assign: ");
-        int numStudents = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        int numStudents = input.nextInt();
+        input.nextLine(); // Consume newline
 
         for (int i = 0; i < numStudents; i++) {
             System.out.print("Enter student ID: ");
-            String studentId = scanner.nextLine();
+            String studentId = input.nextLine();
 
             Student student = findStudentById(studentId);
             if (student == null) {
@@ -296,7 +297,6 @@ public class Dep {
                 System.out.println("Course " + courseName + " is full. Cannot assign more students.");
                 break;
             }
-
             course.enrollStudent(student.id, student.name,student.email);
             student.assignCourse(courseName);
             saveStudents(); // Save changes to students and courses
@@ -355,7 +355,9 @@ public class Dep {
 
 
     public void saveStudents() {
-        try (PrintWriter writer = new PrintWriter(new File("students.txt"))) {
+        try
+        {
+        PrintWriter writer = new PrintWriter(new File("students.txt"));
             for (Student student : students) {
                 writer.println(student.id + " - " + student.name + " - " +
                         student.email + " - " + student.password);
@@ -367,8 +369,6 @@ public class Dep {
             System.out.println("Error saving students: " + e.getMessage());
         }
     }
-
-
 
 
     private void loadStudents() {
@@ -433,19 +433,17 @@ public class Dep {
         }
     }
 
-
-
     private void saveStudentCoursesToFile(Student student) {
         File file = new File("students.txt");
 
         try {
-            Scanner scanner = new Scanner(file);
+            Scanner input = new Scanner(file);
             ArrayList<String> existingLines = new ArrayList<>();
 
-            while (scanner.hasNextLine()) {
-                existingLines.add(scanner.nextLine());
+            while (input.hasNextLine()) {
+                existingLines.add(input.nextLine());
             }
-            scanner.close();
+            input.close();
 
             FileWriter writer = new FileWriter(file, true); // Append mode
             for (String course : student.getAssignedCourses()) {
@@ -459,5 +457,4 @@ public class Dep {
             System.out.println("Error saving student courses: " + e.getMessage());
         }
     }
-
 }

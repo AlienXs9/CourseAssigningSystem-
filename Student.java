@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Student extends Prsn {
+public class Student extends Person {
     protected String password;
     private ArrayList<String> assignedCourses;
 
@@ -22,7 +22,6 @@ public class Student extends Prsn {
     public void setPassword(String password) {
         this.password = password;
     }
-
 
     // Getter for assignedCourses
     public ArrayList<String> getAssignedCourses() {
@@ -46,14 +45,6 @@ public class Student extends Prsn {
         System.out.println("ID: " + id);
         System.out.println("Name: " + name);
         System.out.println("Email: " + email);
-        System.out.println("Assigned Courses: ");
-        if (assignedCourses.isEmpty()) {
-            System.out.println("No courses assigned.");
-        } else {
-            for (String course : assignedCourses) {
-                System.out.println("- " + course);
-            }
-        }
     }
 
     // Save student data to a file

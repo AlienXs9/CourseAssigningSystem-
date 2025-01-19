@@ -2,7 +2,7 @@ package prjct;
 
 import java.util.ArrayList;
 
-public class Faculty extends Prsn {
+public class Faculty extends Person {
     public ArrayList<String> assignedCourses; // List of courses assigned to the faculty
 
     public Faculty(String id, String name, String email) {
@@ -24,16 +24,17 @@ public class Faculty extends Prsn {
         System.out.println("ID: " + id);
         System.out.println("Name: " + name);
         System.out.println("Email: " + email);
+        System.out.println();
         if (assignedCourses.isEmpty()) {
             System.out.println("No courses assigned.");
-        } else {
+        }
+        else {
             System.out.println("Assigned Courses:");
             for (String course : assignedCourses) {
                 System.out.println("- " + course);
             }
         }
     }
-
     // Getter for assigned courses
     public ArrayList<String> getAssignedCourses() {
         return assignedCourses;

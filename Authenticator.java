@@ -2,38 +2,39 @@ package prjct;
 
 import java.util.Scanner;
 
-public class Testing {
+public class Authenticator {
     public static void main(String[] args) {
-        Dep de = new Dep();
-        Scanner scanner = new Scanner(System.in);
-        boolean running = true;
+        Department de = new Department();
+        Scanner input = new Scanner(System.in);
+        boolean isrunning = true;
 
-        while (running) {
+        while (isrunning) {
             System.out.println("\n===== Main Portal =====");
+            System.out.println("\n===== Select in which portal you want to Interact =====");
             System.out.println("1. Department Portal");
             System.out.println("2. Student Portal");
             System.out.println("3. Faculty Portal");
             System.out.println("4. Exit");
             System.out.print("Enter your choice: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            int choice = input.nextInt();
+            input.nextLine(); // Consume newline
 
             switch (choice) {
                 case 1:
-                    departmentPortal(de, scanner);
+                    departmentPortal(de, input);
                     break;
 
                 case 2:
-                    studentPortal(de, scanner);
+                    studentPortal(de, input);
                     break;
 
                 case 3:
-                    facultyPortal(de, scanner);
+                    facultyPortal(de, input);
                     break;
 
                 case 4:
-                    running = false;
+                    isrunning = false;
                     System.out.println("Exiting Portal. Goodbye!");
                     break;
 
@@ -41,13 +42,13 @@ public class Testing {
                     System.out.println("Invalid choice. Please try again.");
             }
         }
-        scanner.close();
+        input.close();
     }
 
-    private static void departmentPortal(Dep de, Scanner scanner) {
-        boolean running = true;
+    private static void departmentPortal(Department de, Scanner scanner) {
+        boolean isrunning = true;
 
-        while (running) {
+        while (isrunning) {
             System.out.println("\n===== Department Portal =====");
             System.out.println("1. Add Students");
             System.out.println("2. Add Faculty");
@@ -56,7 +57,7 @@ public class Testing {
             System.out.println("5. View Department Details");
             System.out.println("6. Assign Students to Course");
             System.out.println("7. Increase Course Seat Size");
-            System.out.println("8. Back to Main Menu");
+            System.out.println("8. Log out");
             System.out.print("Enter your choice: ");
 
             int choice = scanner.nextInt();
@@ -83,30 +84,25 @@ public class Testing {
                     scanner.nextLine(); // Consume newline
                     de.addNewCourse(courseName, seatCapacity);
                     break;
-
                 case 5:
                     de.viewDepartmentDetails();
                     break;
-
                 case 6:
                     de.assignCoursesToStudents();
                     break;
-
                 case 7:
                     de.increaseCourseSeatSize();
                     break;
-
                 case 8:
-                    running = false;
+                    isrunning = false;
                     break;
-
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
         }
     }
 
-    private static void studentPortal(Dep de, Scanner scanner) {
+    private static void studentPortal(Department de, Scanner scanner) {
         System.out.print("\n===== Student Portal =====");
         System.out.print("\nEnter your Student ID to log in: ");
         String studentId = scanner.nextLine();
@@ -116,7 +112,6 @@ public class Testing {
             System.out.println("Invalid Student ID. Please try again.");
             return;
         }
-
         // Check if the student has set a password
         if (student.password == null || student.password.isEmpty()) {
             System.out.println("You need to set a password for your account.");
@@ -127,7 +122,6 @@ public class Testing {
             System.out.println("Password set successfully! Please log in again.");
             return;
         }
-
         // Prompt for password
         System.out.print("Enter your password: ");
         String enteredPassword = scanner.nextLine();
@@ -138,9 +132,9 @@ public class Testing {
         }
 
         System.out.println("Login successful. Welcome, " + student.name + "!");
-        boolean running = true;
+        boolean isrunning = true;
 
-        while (running) {
+        while (isrunning) {
             System.out.println("\n===== Student Portal =====");
             System.out.println("1. View Profile");
             System.out.println("2. View Assigned Courses");
@@ -154,18 +148,15 @@ public class Testing {
                 case 1:
                     student.viewProfile();
                     break;
-
                 case 2:
                     System.out.println("Assigned Courses:");
                     for (String course : student.getAssignedCourses()) {
                         System.out.println("- " + course);
                     }
                     break;
-
                 case 3:
-                    running = false;
+                    isrunning = false;
                     break;
-
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
@@ -173,7 +164,7 @@ public class Testing {
     }
 
 
-    private static void facultyPortal(Dep de, Scanner scanner) {
+    private static void facultyPortal(Department de, Scanner scanner) {
 
         Scanner input = new Scanner(System.in);
         System.out.print("\nEnter your Faculty Email to log in: ");
@@ -185,14 +176,13 @@ public class Testing {
         }
 
         // Successful login
-        System.out.println("Welcome, " + faculty.name + "!");
+        System.out.println("Welcome to the portal, " + faculty.name + "!");
         // Add additional functionality for logged-in faculty, e.g., view courses or update profile
 
-        boolean running = true;
+        boolean isrunning = true;
 
-        while (running) {
+        while (isrunning) {
             System.out.println("\n===== Faculty Portal =====");
-//            System.out.println("1. Add Faculty");
             System.out.println("1. View Faculty Details");
             System.out.println("2. Log out");
             System.out.print("Enter your choice: ");
@@ -201,19 +191,14 @@ public class Testing {
             input.nextLine(); // Consume newline
 
             switch (choice) {
-//                case 1:
-//                    de.addFaculty();
-//                    break;
 
                 case 1:
                     de.viewFacultyDetails(facultyEmail);
                     break;
-
                 case 2:
                     System.out.println("Logged out Succesfully .....!");
-                    running = false;
+                    isrunning = false;
                     break;
-
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
